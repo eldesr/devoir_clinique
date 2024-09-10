@@ -4,8 +4,8 @@ import java.util.Queue;
 public class Clinic {
         private TriageType triageTypeMedecin;
         private TriageType triageTypeRadio;
-        public Queue<String> medQueue = new LinkedList<>();
-        public Queue<String> radioQueue = new LinkedList<>();
+        public Queue<Patient> medQueue = new LinkedList<>();
+        public Queue<Patient> radioQueue = new LinkedList<>();
 
         public Clinic(TriageType triageTypeMedecin, TriageType triageTypeRadio) {
                 this.triageTypeMedecin = triageTypeMedecin;
@@ -13,10 +13,32 @@ public class Clinic {
         }
 
         public void triagePatient(String name, int gravity, VisibleSymptom visibleSymptom) {
-            medQueue.add(name);
+                Patient patient = new Patient(name, gravity);
+
+            if(triageTypeMedecin == TriageType.FIFO){
+                medQueue.add(patient);
+            }
+
+            if(triageTypeMedecin == TriageType.GRAVITY){
+                    if(medQueue.isEmpty()){
+                            medQueue.add(patient);
+                    }
+                    else{
+                        if(patient.gravity > 5){
+                                Queue<Patient> tempMedQueue = new LinkedList<>();
+                                tempMedQueue.addAll(medQueue);
+                                medQueue.clear();
+                                medQueue.add(patient);
+                                medQueue.addAll(tempMedQueue);
+                        }
+                        else{
+                            medQueue.add(patient);
+                        }
+                    }
+            }
 
             if (visibleSymptom == VisibleSymptom.SPRAIN || visibleSymptom == VisibleSymptom.BROKEN_BONE){
-                    radioQueue.add(name);
+                    radioQueue.add(patient);
             }
         }
 
